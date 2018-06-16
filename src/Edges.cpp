@@ -12,6 +12,6 @@ void TakeEdges(Mat& Image, Mat& Edges){
 
 int main(int argc, char const *argv[])
 {
-	
+	cout<<"oi"<<endl;
 	return 0;
 }
