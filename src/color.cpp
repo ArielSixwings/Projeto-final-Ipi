@@ -10,6 +10,7 @@
 
 namespace color {
 namespace bilateral_filter {
+const int INTERATIONS = 14;
 const int NEIGHBORHOOD = 4;
 const double SIGMA_COLOR = 32;
 const double SIGMA_SPACE = 4;
@@ -17,11 +18,11 @@ const double SIGMA_SPACE = 4;
 namespace median {
   const int KERNEL = 7;
 } // namespace median
-const int REDUCTION_FACTOR = 16;
+const int REDUCTION_FACTOR = 20;
 
 cv::Mat blockColorRegions(const cv::Mat& src) {
   cv::Mat filtered;
-  for (int i = 0; i < 14; ++i) {
+  for (int i = 0; i < bilateral_filter::INTERATIONS; ++i) {
     cv::bilateralFilter(src, filtered, bilateral_filter::NEIGHBORHOOD,
                         bilateral_filter::SIGMA_COLOR,
                         bilateral_filter::SIGMA_SPACE);
@@ -35,8 +36,8 @@ cv::Mat blockColorRegions(const cv::Mat& src) {
       pixel[1] = int(pixel[1] / REDUCTION_FACTOR) * REDUCTION_FACTOR;
       pixel[2] = int(pixel[2] / REDUCTION_FACTOR) * REDUCTION_FACTOR;
       filtered.at<cv::Vec3b>(r, c) = pixel;
-    }
-  }
+    } // for (r)
+  }  // for (c)
   return filtered ;
 } // blockColorRegions()
 } // namespace color
