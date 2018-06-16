@@ -2,7 +2,11 @@
 
 int main(int argc, char const *argv[])
 {
-	Mat img = imread("lena.jpg", CV_LOAD_IMAGE_COLOR);
+	cv::Mat img = cv::imread("lena.jpg", CV_LOAD_IMAGE_COLOR);
+	if(img.empty()){
+		cout<<"a imagem não foi lida corretamente"<<endl;
+		return 0;
+	}	
 	imshow("teste",img);
 	waitKey();
 	return 0;
