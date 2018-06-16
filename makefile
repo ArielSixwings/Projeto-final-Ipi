@@ -26,7 +26,7 @@ OBJS= $(addprefix $(DIR_OBJ)/,$(notdir $(SOURCE:.cpp=.o)))
 
 # Compilator and flags:
 CC = g++
-LIBS  = -lm
+LIBS  = -lm `pkg-config --cflags --libs opencv`
 CFLAGS = -std=c++14 -c -Wall -W -Wextra -I $(DIR_INCLUDE)
 
 # ################ #############################################################
