@@ -7,5 +7,6 @@ void TakeEdges(Mat& Image, Mat& Edges){
 	edge.convertTo(draw, CV_8U);
 	namedWindow("image", CV_WINDOW_AUTOSIZE);
 	imshow("image", draw);
-	waitKey(0); 	
+	waitKey(0);
+	//oioioioioi
 }
