@@ -1,5 +1,7 @@
 #include "Edges.hpp"
 
+namespace edges {
+
 void TakeEdges(Mat& Image, Mat& Edges){
 
 	Mat grayImage,auxedge,dst;
@@ -11,3 +13,5 @@ void TakeEdges(Mat& Image, Mat& Edges){
 	imshow("image", Edges);
 	waitKey(0);
 }
+
+} // namespace edges
