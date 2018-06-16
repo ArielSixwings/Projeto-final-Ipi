@@ -7,6 +7,6 @@
 //using namespace cv;
 //using namespace std;
 
-void TakeEdges(cv::Mat& Image, cv::Mat& Edges);
+cv::Mat TakeEdges(cv::Mat& Image);
 
 #endif
