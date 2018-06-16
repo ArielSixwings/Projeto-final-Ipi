@@ -2,11 +2,11 @@
 #define EDGES_H
 
 #include <opencv2/opencv.hpp>
-#include "iostream"
- 
-//using namespace cv;
-//using namespace std;
 
-cv::Mat TakeEdges(cv::Mat& Image);
+namespace edges {
+
+cv::Mat TakeEdges(cv::Mat& image,int lowThreshold, int range);
+  
+} // namespace edges
 
 #endif

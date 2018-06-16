@@ -11,8 +11,15 @@ int main(int argc, char const *argv[])
 	cv::imshow("teste",image);
 	cv::waitKey();
 
-	edges = TakeEdges(image);
-	cv::imshow("edges",edges);
-	cv::waitKey();	
+	for (int j = 5; j < 10; ++j){
+		std::cout<<"range:"<<j<<"\n\n";
+		for (int i = 40; i < 60; ++i){
+			std::cout<<"	lowTreshold:"<<i<<std::endl;
+			edges = edges::TakeEdges(image,i,j);
+			
+		}
+	}
+	//cv::imshow("edges",edges);
+	//cv::waitKey();	
 	return 0;
 }
