@@ -1,17 +1,13 @@
+#include "Edges.hpp"
+
 void TakeEdges(Mat& Image, Mat& Edges){
 
-	Mat grayImage, edge, draw,dst;
+	Mat grayImage,auxedge,dst;
 	cvtColor(Image, grayImage, CV_BGR2GRAY);
 	medianBlur( grayImage, dst, 7 );
-	Canny( dst, edge, 50, 150, 3);
-	edge.convertTo(draw, CV_8U);
+	Canny( dst, auxedge, 50, 150, 3);
+	auxedge.convertTo(Edges, CV_8U);
 	namedWindow("image", CV_WINDOW_AUTOSIZE);
-	imshow("image", draw);
+	imshow("image", Edges);
 	waitKey(0);
-}
-
-int main(int argc, char const *argv[])
-{
-	cout<<"oi"<<endl;
-	return 0;
 }
