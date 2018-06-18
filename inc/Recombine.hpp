@@ -5,7 +5,7 @@
 
 namespace recombine {
 
-void Recombine(cv::Mat& color, cv::Mat& edges);
+cv::Mat Recombine(cv::Mat& color, cv::Mat& edges,double factor);
 
 }// namespace recombine
 
