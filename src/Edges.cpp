@@ -21,10 +21,10 @@ cv::Mat TakeEdges(cv::Mat& image,int lowThreshold, int range){
 }
 
 cv::Mat Dilate(cv::Mat& source){
-	cv::Mat destination;
-	cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3), cv::Point(1, 1) );
-	cv::dilate(source, destination, element);
-	return destination;
+	cv::Mat dst_1;
+	cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2), cv::Point(1, 1) );
+	cv::dilate(source, dst_1, element);
+	return dst_1;
 }
  
 void TakeNegative(cv::Mat& source)
