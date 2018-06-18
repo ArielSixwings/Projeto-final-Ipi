@@ -1,29 +1,119 @@
-#include "Edges.hpp"
+/** @file main.cpp
+ * @author
+   Luigi Minardi Ferreira Maia (17/0017141)
+   Ariel Vieira Lima Serafim (17/0006328)
+ * @date 06/17/2017
+ * @brief Main file to the final IPI project to toonify images.
+ * @copyright GNU Public License.
+*/
+
+#include <iostream>
+#include <string>
+
+#include <opencv2/opencv.hpp>
+
 #include "color.hpp"
+#include "Edges.hpp"
 #include "Recombine.hpp"
-int main(int argc, char const *argv[])
-{
-	cv::Mat image = cv::imread("Cat.jpg", CV_LOAD_IMAGE_COLOR);
-	cv::Mat edges;
-	if(image.empty()){
-		std::cout<<"problens to read image"<<std::endl;
+
+namespace {
+
+/** Show usage mensage to the user.
+*/
+void usageMensage(char* argv[]) {
+	std::cout
+		<< "\033[1;33m" << "Usage:\n" << "\033[0m"
+		<< '\t' << argv[0] << " path/to/images path/to/save/result/images" << '\n'
+	  << '\t' << "In this way, the software gonna take all the images in the"
+	  << " directory and save in the path/to/save/result/images file." << '\n'
+		<< '\n'
+  	<< '\t' << argv[0] << " path/to/image" << '\n'
+		<< '\t' << "In this way, the software gonna take one image and show on the"
+		<< " screen." << '\n'
+		<< '\n'
+		<< '\t' << "User can must use '/' as the current directory." << '\n'
+		<< '\t' << "Exemple: "  << argv[0] << " /" << '\n'
+		<< '\t' <<"or: " << argv[0] << " path/to/images /" << '\n';
+} // usageMensage()
+
+/** Display cv::Mat object to the user in a resizeble window.
+*/
+void displayImage(const cv::Mat img, const std::string window_name,
+                  size_t n_rows = 0, size_t n_cols = 0,
+					        size_t pos_x = 0, size_t pos_y = 0) {
+  if (n_rows == 0) // if n_rows wasn't set
+    n_rows = img.rows;
+  if (n_cols == 0) // if n_cols was't set.
+    n_cols = img.cols;
+	cv::namedWindow(window_name, CV_WINDOW_FREERATIO);
+	cv::imshow(window_name, img);
+	cv::resizeWindow(window_name, n_cols, n_rows);
+	cv::moveWindow(window_name, pos_x, pos_y);
+}  // displayImage()
+
+} // namespace
+
+
+std::vector<cv::String> generateOutputFilesName(std::vector<cv::String> src) {
+	std::vector<cv::String> output_files(src.size());
+	for (int i = 0; i < src.size(); ++i) {
+		output_files[i] = "TOON/";
+    for (int c = 0; c < src[i].size(); ++c) {
+			if (src[i][c] == '/')
+			  output_files[i] = "TOON/";
+		  else
+			  output_files[i] += src[i][c];
+		} // for (c)
+	} // for (i)
+	return output_files;
+} // generateOutputFilesName()
+
+
+int main(int argc, char* argv[]) {
+	if (argc != 2) {
+		usageMensage(argv);
 		return 0;
-	}	
-	cv::imshow("Original image",image);
-	cv::waitKey();
-
-	edges = edges::TakeEdges(image,55,5);
-	edges = edges::Dilate(edges);
-	edges::TakeNegative(edges);
-	
-
-	image = color::blockColorRegions(image);
-	cv::imshow("step color", image);
-	cv::waitKey();
-	
-	recombine::Recombine(image,edges);
-	cv::imshow("final", image);
-	cv::waitKey();
-	//std::cout<<edges<<std::endl;
-	return 0;
-}
+	} // if (argc != 2)
+	std::string input_file = argv[1];
+	bool did_something = false;
+	if (input_file == "/") // current directory was selected
+		input_file = "";
+  cv::Mat src = cv::imread(input_file, CV_LOAD_IMAGE_COLOR);
+	if (!src.empty()) {
+		did_something = true;
+	  std::cout << "Processing image" << input_file <<'\n';
+		/*
+		cv::Mat img = toonify(img);
+		*/
+		displayImage(src /*img*/, "Toonifyed" + input_file);
+		cv::waitKey();
+	} else { // Process some image in input_file
+		std::vector<cv::String> images_file;  //cv::vector< String > Files
+		cv::glob(input_file, images_file);
+		std::vector<cv::String> images_output = generateOutputFilesName(images_file);
+		if (images_file.size() == 0) {
+		  std::cout << "The software couldn't find any image " << input_file
+			  << " or in a directory with this name." << '\n';
+			usageMensage(argv);
+			return 0;
+		} // if images_file.size() == 0)
+		for (unsigned i = 0; i < images_file.size(); ++i) {
+			src = cv::imread(images_file[i], CV_LOAD_IMAGE_COLOR);
+			if (src.empty())
+			  continue;
+			std::cout << "Processing image: " << images_file[i] << '\n';
+			std::cout << "Going to file: " << images_output[i] << '\n';
+			did_something = true;
+			/*
+			cv::Mat img = toonify(img);
+			cv::imwrite("TOONS/" + std::to_string(i));
+			*/
+		} // for (i)
+	} // if (!src.empty()) // else
+	if (did_something == false) {
+		std::cout << "The software couldn't find any image " << input_file
+			<< " or in a directory with this name." << '\n';
+		usageMensage(argv);
+		return 0;
+	} // if (did_something == false)
+} // main()
