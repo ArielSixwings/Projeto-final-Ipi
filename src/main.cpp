@@ -53,38 +53,67 @@ void displayImage(const cv::Mat img, const std::string window_name,
 
 } // namespace
 
-int main(int argc, char* argv[]) {
-	for (int i = 0; i < argc; ++i) {
-    if (std::string(argv[i]) == "/") // if the current directory was selected
-		  argv[i] = "";
+
+std::vector<cv::String> generateOutputFilesName(std::vector<cv::String> src) {
+	std::vector<cv::String> output_files(src.size());
+	for (int i = 0; i < src.size(); ++i) {
+		output_files[i] = "TOON/";
+    for (int c = 0; c < src[i].size(); ++c) {
+			if (src[i][c] == '/')
+			  output_files[i] = "TOON/";
+		  else
+			  output_files[i] += src[i][c];
+		} // for (c)
 	} // for (i)
-	if (argc == 2) { // Process a single image and display;
-    cv::Mat src = cv::imread(argv[1], CV_LOAD_IMAGE_COLOR);
-		if (src.empty()) {
-			std::cout << "The software couldn't find any image with the name:"
-			  << argv[1] << '\n';
-			usageMensage(argv);
-			return 0;
-		} // if (img.empty())
+	return output_files;
+} // generateOutputFilesName()
+
+
+int main(int argc, char* argv[]) {
+	if (argc != 2) {
+		usageMensage(argv);
+		return 0;
+	} // if (argc != 2)
+	std::string input_file = argv[1];
+	bool did_something = false;
+	if (input_file == "/") // current directory was selected
+		input_file = "";
+  cv::Mat src = cv::imread(input_file, CV_LOAD_IMAGE_COLOR);
+	if (!src.empty()) {
+		did_something = true;
+	  std::cout << "Processing image" << input_file <<'\n';
 		/*
 		cv::Mat img = toonify(img);
 		*/
-		displayImage(src /*img*/, std::string("Toonifyed") + argv[1]);
+		displayImage(src /*img*/, "Toonifyed" + input_file);
 		cv::waitKey();
-	} else if (argc == 3) { // Process some image in argc[1] and save in argc[2]
+	} else { // Process some image in input_file
 		std::vector<cv::String> images_file;  //cv::vector< String > Files
-		cv::glob(argv[1], images_file);
+		cv::glob(input_file, images_file);
+		std::vector<cv::String> images_output = generateOutputFilesName(images_file);
 		if (images_file.size() == 0) {
-		  std::cout << "The software couldn't find any image in " << argv[1] <<'\n';
+		  std::cout << "The software couldn't find any image " << input_file
+			  << " or in a directory with this name." << '\n';
 			usageMensage(argv);
 			return 0;
 		} // if images_file.size() == 0)
 		for (unsigned i = 0; i < images_file.size(); ++i) {
-			std::cout << " Reading " << images_file[i] << '\n';
-			cv::Mat src = 
-			if (image)
+			src = cv::imread(images_file[i], CV_LOAD_IMAGE_COLOR);
+			if (src.empty())
+			  continue;
+			std::cout << "Processing image: " << images_file[i] << '\n';
+			std::cout << "Going to file: " << images_output[i] << '\n';
+			did_something = true;
+			/*
+			cv::Mat img = toonify(img);
+			cv::imwrite("TOONS/" + std::to_string(i));
+			*/
 		} // for (i)
-	} else {
+	} // if (!src.empty()) // else
+	if (did_something == false) {
+		std::cout << "The software couldn't find any image " << input_file
+			<< " or in a directory with this name." << '\n';
 		usageMensage(argv);
-	} // if (argc == 2) // else if (argc == 3) // else
+		return 0;
+	} // if (did_something == false)
 } // main()
