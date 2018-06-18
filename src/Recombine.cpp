@@ -1,6 +1,5 @@
 #include "Recombine.hpp"
 
-//#define factor 0.0
 namespace recombine {
 
 cv::Mat Recombine(cv::Mat& color, cv::Mat& edges,double factor){
@@ -21,11 +20,8 @@ cv::Mat Recombine(cv::Mat& color, cv::Mat& edges,double factor){
 			colorpixel[2] = (colorpixel[2]*factor); //edges.at<uchar>(r,c));
 			
 			final_image.at<cv::Vec3b>(r,c) = colorpixel;
-			//std::cout<<color.at<cv::Vec3b>(r,c)<<std::endl;
 		}
-	}
-	// cv::imshow("final", final_image);
-	// cv::waitKey();	
+	}	
 	return final_image;
 }
 
