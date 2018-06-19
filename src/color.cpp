@@ -18,10 +18,9 @@ const double SIGMA_SPACE = 5;
 } // namespace bilateralFilter
 
 namespace median {
-
 const int KERNEL = 7;
-
 } // namespace median
+
 const int COLOR_FACTOR = 10 ; /// COLOR_FACTOR = 256/num_colors;
 
 cv::Mat blockColorRegions(const cv::Mat& src) {
