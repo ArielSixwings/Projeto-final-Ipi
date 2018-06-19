@@ -9,6 +9,8 @@ cv::Mat TakeEdges(cv::Mat& image,int lowThreshold, int range);
 
 cv::Mat Dilate(cv::Mat& source);
 
+cv::Mat EdgeFilter(cv::Mat& source,int threshold);
+
 void TakeNegative(cv::Mat& source);
   
 } // namespace edges

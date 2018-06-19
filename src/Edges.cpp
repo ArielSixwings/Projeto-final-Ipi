@@ -21,11 +21,30 @@ cv::Mat TakeEdges(cv::Mat& image,int lowThreshold, int range){
 }
 
 cv::Mat Dilate(cv::Mat& source){
-	cv::Mat dst_1;
+	cv::Mat destination;
 	cv::Mat element = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(2, 2), cv::Point(1, 1) );
-	cv::dilate(source, dst_1, element);
-	return dst_1;
+	cv::dilate(source, destination, element);
+	return destination;
 }
+
+cv::Mat EdgeFilter(cv::Mat& source,int threshold){
+	
+	cv::Mat labelImage(source.size(), CV_32S);
+	cv::Mat filtered(source.size(), CV_8U);
+	source.copyTo(filtered);
+	cv::Mat stats, centroids;
+	connectedComponentsWithStats(source, labelImage, stats, centroids, 8, CV_32S);
+
+	for (int r = 0; r < source.rows; ++r){
+		for (int c = 0; c < source.cols; ++c){
+			int aux_label = labelImage.at<int>(r,c);
+			if ((stats.at<int>(aux_label, cv::CC_STAT_AREA)) < threshold){
+				filtered.at<uchar>(r,c) = 0;
+			}
+		}
+	}
+	return filtered;
+} 
  
 void TakeNegative(cv::Mat& source)
 {
@@ -37,5 +56,6 @@ void TakeNegative(cv::Mat& source)
 		}
 	}
 }
+
 
 } // namespace edges
