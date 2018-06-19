@@ -59,5 +59,17 @@ TEST_CASE ("All") {
 		image = recombine::Recombine(color_image,edges,(0.0));
 		cv::imshow("final", image);
 	}
+	SECTION ("rocky") {
+		cv::Mat image = cv::imread("Images/rocky.jpg", CV_LOAD_IMAGE_COLOR);
+		cv::Mat edges;
+		cv::Mat color_image;
+		edges = edges::TakeEdges(image,lowThreshold,range);
+		edges = edges::Dilate(edges);
+		edges = edges::EdgeFilter(edges,12);
+		edges::TakeNegative(edges);
+		color_image = color::blockColorRegions(image);				
+		image = recombine::Recombine(color_image,edges,(0.0));
+		cv::imshow("final", image);
+	}	
 	cv::waitKey();
 } // TEST_CASE
