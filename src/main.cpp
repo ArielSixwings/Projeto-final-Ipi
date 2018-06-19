@@ -7,8 +7,10 @@
  * @copyright GNU Public License.
 */
 
+#include <cstdlib>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include <opencv2/opencv.hpp>
 
@@ -18,22 +20,38 @@
 
 namespace {
 
+/** Return the toonifyed image.
+*/
+cv::Mat toonify(cv::Mat& src) {
+	cv::Mat toon_color;
+	std::thread do_colors([&]() { // Do in parallel;
+	  toon_color = color::blockColorRegions(src);
+  });
+	cv::Mat toon_edges = edges::TakeEdges(src, 55, 5);
+	toon_edges = edges::Dilate(toon_edges);
+	edges::TakeNegative(toon_edges);
+  do_colors.join();
+	cv::Mat img = recombine::Recombine(toon_color, toon_edges, 0.5);
+	return img;
+}
+
 /** Show usage mensage to the user.
 */
 void usageMensage(char* argv[]) {
 	std::cout
 		<< "\033[1;33m" << "Usage:\n" << "\033[0m"
-		<< '\t' << argv[0] << " path/to/images path/to/save/result/images" << '\n'
-	  << '\t' << "In this way, the software gonna take all the images in the"
-	  << " directory and save in the path/to/save/result/images file." << '\n'
 		<< '\n'
   	<< '\t' << argv[0] << " path/to/image" << '\n'
 		<< '\t' << "In this way, the software gonna take one image and show on the"
 		<< " screen." << '\n'
 		<< '\n'
+		<< '\t' << argv[0] << " path/to/multiple images" << '\n'
+		<< '\t' << "In this way, the software gonna take one image save the"
+		<< " processed images in a new directory called TOONS in the current"
+		<< " directory." << '\n'
+		<< '\n'
 		<< '\t' << "User can must use '/' as the current directory." << '\n'
-		<< '\t' << "Exemple: "  << argv[0] << " /" << '\n'
-		<< '\t' <<"or: " << argv[0] << " path/to/images /" << '\n';
+		<< '\t' << "Exemple: "  << argv[0] << " /" << '\n';
 } // usageMensage()
 
 /** Display cv::Mat object to the user in a resizeble window.
@@ -53,8 +71,11 @@ void displayImage(const cv::Mat img, const std::string window_name,
 
 } // namespace
 
-
-std::vector<cv::String> generateOutputFilesName(std::vector<cv::String> src) {
+/** Make the output files name.
+*/
+std::vector<cv::String> generateOutputFilesName(
+	  const std::vector<cv::String>& src) {
+	std::system("mkdir TOON");
 	std::vector<cv::String> output_files(src.size());
 	for (int i = 0; i < src.size(); ++i) {
 		output_files[i] = "TOON/";
@@ -75,25 +96,24 @@ int main(int argc, char* argv[]) {
 		return 0;
 	} // if (argc != 2)
 	std::string input_file = argv[1];
-	bool did_something = false;
-	if (input_file == "/") // current directory was selected
+	if (input_file == "/")  // current directory was selected
 		input_file = "";
+	bool did_something = false;
   cv::Mat src = cv::imread(input_file, CV_LOAD_IMAGE_COLOR);
 	if (!src.empty()) {
 		did_something = true;
 	  std::cout << "Processing image" << input_file <<'\n';
-		/*
-		cv::Mat img = toonify(img);
-		*/
-		displayImage(src /*img*/, "Toonifyed" + input_file);
+		cv::Mat img = toonify(src);
+		displayImage(src, input_file);
+		displayImage(img, "Toonifyed " + input_file);
 		cv::waitKey();
 	} else { // Process some image in input_file
 		std::vector<cv::String> images_file;  //cv::vector< String > Files
 		cv::glob(input_file, images_file);
-		std::vector<cv::String> images_output = generateOutputFilesName(images_file);
+		auto images_output = generateOutputFilesName(images_file);
 		if (images_file.size() == 0) {
-		  std::cout << "The software couldn't find any image " << input_file
-			  << " or in a directory with this name." << '\n';
+		  std::cout << "The software couldn't find any image"
+			  << " or directory with this name: " << input_file <<'\n';
 			usageMensage(argv);
 			return 0;
 		} // if images_file.size() == 0)
@@ -102,12 +122,11 @@ int main(int argc, char* argv[]) {
 			if (src.empty())
 			  continue;
 			std::cout << "Processing image: " << images_file[i] << '\n';
-			std::cout << "Going to file: " << images_output[i] << '\n';
+
 			did_something = true;
-			/*
-			cv::Mat img = toonify(img);
-			cv::imwrite("TOONS/" + std::to_string(i));
-			*/
+			cv::Mat img = toonify(src);
+			cv::imwrite(images_output[i], img);
+			std::cout << '\t' << "Saving in file: " << images_output[i] << '\n';
 		} // for (i)
 	} // if (!src.empty()) // else
 	if (did_something == false) {
