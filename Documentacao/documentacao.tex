@@ -1,29 +1,56 @@
 \documentclass[10pt,technote]{IEEEtran}
 
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+
 \usepackage{blindtext}
 \usepackage[brazilian]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{cite}
 
-\title{Toonify: um projeto de processamento de imagens}
-\date{2018\\ julho}
-\author{Ariel Vieira Lima Serafim\\ 
-\and Luigi}
-
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
-	\maketitle
-	\section*{Abstract}
-	\section*{Introdução}
-	\section*{Referências e trabalhos semelhantes}
-		A base para o trabalho foi o artigo \cite{CITA-artigobase}
-	\section*{Soluções propostas}
-	\section*{Resultados experimentais}
-	\section*{Conclusões}
+\title{Toonify:\\
+{\footnotesize \textsuperscript{*}a project in image processing}
+}
+\author{\IEEEauthorblockN{1\textsuperscript{st} Ariel Vieira Lima Serafim}
+\IEEEauthorblockA{\textit{UNIVERSITY OF BRASÍLIA} \\
+\textit{DEPARTMENT OF COMPUTER SCIENCE}\\
+Brasília, Brazil \\
+arielserafim@gmail.com\\}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Luigi Minardi Ferreira Maia}
+\IEEEauthorblockA{\textit{UNIVERSITY OF BRASÍLIA} \\
+\textit{DEPARTMENT OF COMPUTER SCIENCE}\\
+Brasília, Brazil \\
+email address}
+}
 
-	\begin{thebibliography}{20}
-	\bibitem{CITA-artigobase}
+\maketitle
+\begin{abstract}
+This project is an attempt to reproduce and improve the algorithm proposed by Kevin Dade in his article\cite{CITE-artigobase} 
+\textit{Toonify: Cartoon Photo Effect Application}, that seeks to emulate the types of cel-sheding
+\end{abstract}
+
+\section{Introdução}
+	O filme \textit{"Who Framed Roger Rabbit"}\cite{CITE-filme} (1988),foi responsável por aumentar o interesse em misturar desenhos e realidade. \\O efeito toon é muito conhecido, trata-se de tornar objetos, seres e paisagens reais mais semelhantes a desenhos do estilo cartoon.\\
+\section{Referências e trabalhos semelhantes}
+	A base para o trabalho foi o artigo \cite{CITE-artigobase}
+\section{Soluções propostas}
+\section{Resultados experimentais}
+\section{Conclusões}
+
+\begin{thebibliography}{20}
+	\bibitem{CITE-artigobase}
 	Kevin Dade:\\
 	Toonify: Cartoon Photo Effect Application.
-	\end{thebibliography}
+	\bibitem{CITE-filme}
+	Who Framed Roger Rabbit\\
+	https://en.wikipedia.org/wiki/Who_Framed_Roger_Rabbit.	
+\end{thebibliography}
+
 \end{document}
