@@ -10,6 +10,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <thread>
 
 #include <opencv2/opencv.hpp>
 
@@ -18,6 +19,21 @@
 #include "Recombine.hpp"
 
 namespace {
+
+/** Return the toonifyed image.
+*/
+cv::Mat toonify(cv::Mat& src) {
+	cv::Mat toon_color;
+	std::thread do_colors([&]() { // Do in parallel;
+	  toon_color = color::blockColorRegions(src);
+  });
+	cv::Mat toon_edges = edges::TakeEdges(src, 55, 5);
+	toon_edges = edges::Dilate(toon_edges);
+	edges::TakeNegative(toon_edges);
+  do_colors.join();
+	cv::Mat img = recombine::Recombine(toon_color, toon_edges, 0.5);
+	return img;
+}
 
 /** Show usage mensage to the user.
 */
@@ -55,12 +71,11 @@ void displayImage(const cv::Mat img, const std::string window_name,
 
 } // namespace
 
-
+/** Make the output files name.
+*/
 std::vector<cv::String> generateOutputFilesName(
-  const std::vector<cv::String>& src,
-  const std::string& directory_name) {
-	char* command = "mkdir " + directory_name;
-	std::system(command);
+	  const std::vector<cv::String>& src) {
+	std::system("mkdir TOON");
 	std::vector<cv::String> output_files(src.size());
 	for (int i = 0; i < src.size(); ++i) {
 		output_files[i] = "TOON/";
@@ -76,37 +91,29 @@ std::vector<cv::String> generateOutputFilesName(
 
 
 int main(int argc, char* argv[]) {
-	if (argc < 2 || argc > 3) {
+	if (argc != 2) {
 		usageMensage(argv);
 		return 0;
 	} // if (argc != 2)
 	std::string input_file = argv[1];
 	if (input_file == "/")  // current directory was selected
 		input_file = "";
-	std::string output_dir;
-	if (argc == 3) {
-	  output_dir = argv[2];
-		if (output_dir == "/")
-		  output_dir = "";
-	} else {
-    output_dir = "TOON";
-	} // if (argc == 3)
 	bool did_something = false;
   cv::Mat src = cv::imread(input_file, CV_LOAD_IMAGE_COLOR);
 	if (!src.empty()) {
 		did_something = true;
 	  std::cout << "Processing image" << input_file <<'\n';
-		cv::Mat img /*= toonify(img)*/;
+		cv::Mat img = toonify(src);
 		displayImage(src, input_file);
 		displayImage(img, "Toonifyed " + input_file);
 		cv::waitKey();
 	} else { // Process some image in input_file
 		std::vector<cv::String> images_file;  //cv::vector< String > Files
 		cv::glob(input_file, images_file);
-		auto images_output = generateOutputFilesName(images_file, output_dir);
+		auto images_output = generateOutputFilesName(images_file);
 		if (images_file.size() == 0) {
-		  std::cout << "The software couldn't find any image " << input_file
-			  << " or in a directory with this name." << '\n';
+		  std::cout << "The software couldn't find any image"
+			  << " or directory with this name: " << input_file <<'\n';
 			usageMensage(argv);
 			return 0;
 		} // if images_file.size() == 0)
@@ -117,8 +124,8 @@ int main(int argc, char* argv[]) {
 			std::cout << "Processing image: " << images_file[i] << '\n';
 
 			did_something = true;
-			cv::Mat img/* = toonify(src)*/;
-			cv::imwrite(images_output[i], src);
+			cv::Mat img = toonify(src);
+			cv::imwrite(images_output[i], img);
 			std::cout << '\t' << "Saving in file: " << images_output[i] << '\n';
 		} // for (i)
 	} // if (!src.empty()) // else
