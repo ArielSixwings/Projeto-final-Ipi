@@ -5,8 +5,8 @@
 #include "Edges.hpp"
 #include "Recombine.hpp"
 
-#define lowThreshold  50
-#define range  10
+#define lowThreshold  55
+#define range  5
 
 TEST_CASE ("All") {
 	SECTION ("Lena") {
