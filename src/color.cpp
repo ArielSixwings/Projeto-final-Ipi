@@ -39,16 +39,16 @@ std::tuple<int, int, int, double, double, int, int> defineConstants(
     const cv::Mat& src) {
   double colourfuness = imageColourfulness(src);
   bool to_resize = (std::sqrt(src.rows * src.cols) > 1000)? true : false;
-  int interations = 10 + colourfuness/10;
+  int iterations = 10 + colourfuness/10;
   int neighboorhood = 9;
   double sigma_color = 685/colourfuness;
   double sigma_space = 5;
   int kernel = 7;
   int color_factor = 10 + colourfuness/5;
   return std::forward_as_tuple(
-           to_resize, interations, neighboorhood,
+           to_resize, iterations, neighboorhood,
            sigma_color, sigma_space,
-           kernel = 7,
+           kernel,
            color_factor);
 } // defineConstants()
 
@@ -56,15 +56,15 @@ std::tuple<int, int, int, double, double, int, int> defineConstants(
 
 cv::Mat blockColorRegions(const cv::Mat& src) {
   bool to_resize;
-  int interations, neighboorhood;
+  int iterations, neighboorhood;
   double sigma_color, sigma_space;
   int kernel;
   int color_factor;
-  std::tie(to_resize, interations, neighboorhood, sigma_color, sigma_space,
+  std::tie(to_resize, iterations, neighboorhood, sigma_color, sigma_space,
            kernel, color_factor) = defineConstants(src);
   cv::Mat filtered;
   cv::pyrDown(src, filtered, cv::Size(src.cols/2, src.rows/2));
-  for (int i = 0; i < interations; ++i) {
+  for (int i = 0; i < iterations; ++i) {
     cv::Mat aux; // The funtion bilateralFilter doesn't work inplace, that is
                  //why I need to create and destroy this aux varible.
     cv::bilateralFilter(filtered, aux, neighboorhood, sigma_color, sigma_space);

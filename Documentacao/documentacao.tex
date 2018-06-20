@@ -27,7 +27,7 @@ arielserafim@gmail.com\\}
 \IEEEauthorblockA{\textit{UNIVERSITY OF BRASÍLIA} \\
 \textit{DEPARTMENT OF COMPUTER SCIENCE}\\
 Brasília, Brazil \\
-email address}
+luigimaia99@gmail.com}
 }
 
 \maketitle
@@ -39,19 +39,66 @@ This project is an attempt to reproduce and improve the algorithm proposed by Ke
 \section{Introdução}
 	O efeito toon é muito conhecido, trata-se de tornar objetos, seres e paisagens reais mais semelhantes à desenhos do estilo cartoon, para isso é preciso investir em alguma forma de simplificar as imagens.\\
 	A forma de simplificação utilizada aqui é uma adaptação  do processo de Cel shading\cite{CITE-celshading} para fotos.  
+	
 \section{Referências e trabalhos semelhantes}
-	A base para o trabalho foi o artigo \cite{CITE-artigobase}
+
+	A base para o trabalho foi o artigo de Kevin Dade, Toonify: Cartoon Photo Effect Application \cite{CITE-artigobase}.
+	
 \section{Soluções propostas}
-	O processo foi feito em duas partes, descritas a seguir.
-	\subsection{bordas}
+	Como objetivo do processo de cartoonificação das images é simplificar tanto as bordas quanto as cores da imagem, o processo é feito em três partes: processamento das bordas da imagem, processamento das cores da imagem e, no final, junta-se o resultado dos dois processos anteriores em apenas uma imagem. 
+	
+	Como o processo de adquirir as bordas da imagem e o de adquirir as cores são mutualmente independes, essas duas partes são feitas em paralelo a fim de economizar tempo de execução.
+	
+	\subsection{Adquirir uma imagem contendo as bordas}
 		\subsubsection{Filtro mediana}
-			O primeiro processamento feito sobre a imagem é um filtro de mediana com uma matriz 7x7 como kernel, esse passo é importante para diminuir possíveis ruídos salt and pepper e também para diminuir o número de falsas bordas que poderiam ser detectadas caso a imagem estivesse detalhada demais.Vale lembrar que o tamanho do kernel garante a manutenção de detalhes relevantes.\\
+			O primeiro processamento feito sobre a imagem é um filtro de mediana com uma matriz 7x7 como kernel, esse passo é importante para diminuir possíveis ruídos salt and pepper e também para diminuir o número de falsas bordas que poderiam ser detectadas caso a imagem estivesse detalhada demais.Vale lembrar que o tamanho do kernel garante a manutenção de detalhes relevantes.
+			
 		\subsubsection{Detector de bordas Canny}
-			Esta é a etapa principal da parte de detecção de bordas. Outros algoritmos poderiam ter sido usados, como o algoritmo laplaciano, entretanto outras operações teriam de ser feitas sobre o resultado pois o laplaciano não garante que as bordas tenham largura 1 e isso gera efeitos indesejáveis no resultado final, além de dificultar o uso de operações morfológicas descritas a seguir.\\
+			Esta é a etapa principal da parte de detecção de bordas. Outros algoritmos poderiam ter sido utilizados, como o algoritmo laplaciano, entretanto outras operações teriam de ser feitas sobre o resultado pois o laplaciano não garante que as bordas tenham largura 1 e isso gera efeitos indesejáveis no resultado final, além de dificultar o uso de operações morfológicas descritas a seguir.
+			
 		\subsubsection{Operações morfologicas}
-			Com as bordas da imagem em mãos, processamentos morfologicos são feitos para melhorar o efeito das bordas na imagem final.A operação escolhida aqui é a dilatação, esse processo realça as bordas e tende a juntar regiões, oque  é importante para a eficiência do passo seguinte.\\
+			Obtidas as bordas da imagem, é necessário ainda que sejam feitos processamentos morfologicos para melhorar o efeito das bordas na imagem final. A operação escolhida aqui é a dilatação, esse processo realça as bordas e tende a juntar regiões, o que é importante para a eficiência do passo seguinte.
+			
 		\subsubsection{Filtrar bordas}
-			Nesta etapa buscamos remover bordas muito pequenas, que geram um efeito muito semelhante ao ruído salt and pepper. Para remover esse "ruído" interpretamos as bordas como regiões conectadas e removemos as que possuirem uma área menor que um limite determinado.  
+			Nesta etapa buscamos remover bordas muito pequenas, que geram um efeito muito semelhante ao ruído salt and pepper. Para remover esse "ruído" interpretamos as bordas como regiões conectadas e removemos as que possuirem uma área menor que um limite determinado.
+		
+		\subsection{Filtrar as cores da imagem}
+			\subsection{Adquirir o grau de "colorido" da imagem}
+				Como cada imagem possui um aspecto único, filtrar diferentes imagens, sempre com os mesmos parâmetros pode significar priorizar o processamento de algumas imagens em relação a outras. O modo encontrado de diferenciar as imagens foi encontrando o seu grau de colorido por meio do processo descrito em \textit{Measuring colourfulness in natural images} \cite{CITE-colourfuness}.
+			\subsubsection{Filtrar bilateralmente}
+				A partir da imagem de origem, utiliza-se um processo conhecido por borrar as cores da imagem, porém mantendo as bordas bem definidas. Como, descrito no artigo \textit{A Gentle Introduction to Bilateral Filtering and its Applications} \cite{CITE-bilateralfilter}.
+				Como o filtro tem um grau de complexidade grande, opta-se por diminuir a imagem à metade e aplicar o filtro iterativamente com um kernel não tão grande de tamanho 9 por 9. O filtro possui duas entradas que são as variâncias $\sigma_r^2$ utilizadas pela gaussiana para cor e $\sigma_s^2$ que é a variância utilizada pelo filtro para distância entre os pixels. Além das entradas do filtro, é necessário escolher $I$ que é quantas vezes o filtro será utilizado iterativamente. Com alguns testes, decidiu-se escolher as essas constantes da seguinte forma:
+				$$
+				\sigma_r^2 = 	\frac{685}{C}
+				$$
+				$$
+				\sigma_s^2 = 5
+				$$
+				$$
+				I = 10 + \frac{C}{10}
+				$$
+				em que $C$ é o grau de colorido da imagem.
+				No final, volta-se a imagem para o tamanho de origem.
+			\subsubsection{Filtrar com a mediana}
+			Neste estágio, deve-se utilizar o filtro da mediana para olcutar qualquer erro que tenha ocorrido durante o aumento da imagem para o tamanho original. Utilizou-se um kernel de tamaho 7 por 7.
+			\subsubsection{Requantificar as cores}
+			Para que o número de cores fosse reduzido, realiza-se sobre cada canal dos pixels uma operação de requantização que em dado pela seguinte fórmula:
+			$$
+			p_{new} = \left\lfloor\frac{p}{a}\right\rfloor \cdot a
+			$$
+			em que $p$ é o valor do canal do pixel e $a$ é um fator de pelo qual o número de cores possíveis será diminuido. Porém, a aplicação desse efeito tem como aspecto negativo escurecer as imagens, então, optou-se pelo uso da seguinte fómula:
+			$$
+			p_{new} = \left\lfloor\frac{p}{a}\right\rfloor \cdot a
+			+ 255 - \left\lfloor\frac{255}{a}\right\rfloor \cdot a
+			$$
+			em que 255 é o valor máximo das cores em cada canal de cores. Já o valor de $a$ é escolhido a partir da seguinte fórmula:
+			$$
+			a = 10 + \frac{C}{5}
+			$$
+			em que novamente $C$ é o grau de "colorido" da imagem.
+			
+			\section{•}
+							
 \section{Resultados experimentais}
 
 \section{Conclusões}
@@ -63,8 +110,16 @@ This project is an attempt to reproduce and improve the algorithm proposed by Ke
 	\bibitem{CITE-celshading}
 	Cel shading\\
 	https://en.wikipedia.org/wiki/Celshading
+	\bibitem{CITE-colourfuness}
+	David Hasler a and Sabine Süsstrunk\\
+	Measuring colourfulness in natural images
+	\bibitem{CITE-bilateralfilter}
+	Sylvain Paris$^1$, Pierre Kornprobst$^2$, Jack Tumblin$^3$ and Frédo Durand$^4$\\
+	A Gentle Introduction to Bilateral Filtering and its Applications
+	
 
 
 \end{thebibliography}
 
 \end{document}
+\grid
