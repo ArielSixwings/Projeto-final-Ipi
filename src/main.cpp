@@ -122,7 +122,6 @@ int main(int argc, char* argv[]) {
 			if (src.empty())
 			  continue;
 			std::cout << "Processing image: " << images_file[i] << '\n';
-
 			did_something = true;
 			cv::Mat img = toonify(src);
 			cv::imwrite(images_output[i], img);
