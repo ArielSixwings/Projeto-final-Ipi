@@ -1,8 +1,9 @@
 ################################################################################
-# Project name
-# @file
+# Toonify images
+# @file makefile to compile prject.
 # Authors:
-#		-
+#		- Luigi Minardi Ferreira Maia
+#   - Ariel Vieira Lima Serafim
 ################################################################################
 
 
