@@ -37,20 +37,34 @@ This project is an attempt to reproduce and improve the algorithm proposed by Ke
 \end{abstract}
 
 \section{Introdução}
-	O filme \textit{"Who Framed Roger Rabbit"}\cite{CITE-filme} (1988),foi responsável por aumentar o interesse em misturar desenhos e realidade. \\O efeito toon é muito conhecido, trata-se de tornar objetos, seres e paisagens reais mais semelhantes a desenhos do estilo cartoon.\\
+	O efeito toon é muito conhecido, trata-se de tornar objetos, seres e paisagens reais mais semelhantes à desenhos do estilo cartoon, para isso é preciso investir em alguma forma de simplificar as imagens.\\
+	A forma de simplificação utilizada aqui é uma adaptação  do processo de Cel shading\cite{CITE-celshading} para fotos.  
 \section{Referências e trabalhos semelhantes}
 	A base para o trabalho foi o artigo \cite{CITE-artigobase}
 \section{Soluções propostas}
+	O processo foi feito em duas partes, descritas a seguir.
+	\subsection{bordas}
+		\subsubsection{Filtro mediana}
+			O primeiro processamento feito sobre a imagem é um filtro de mediana com uma matriz 7x7 como kernel, esse passo é importante para diminuir possíveis ruídos salt and pepper e também para diminuir o número de falsas bordas que poderiam ser detectadas caso a imagem estivesse detalhada demais.Vale lembrar que o tamanho do kernel garante a manutenção de detalhes relevantes.\\
+		\subsubsection{Detector de bordas Canny}
+			Esta é a etapa principal da parte de detecção de bordas. Outros algoritmos poderiam ter sido usados, como o algoritmo laplaciano, entretanto outras operações teriam de ser feitas sobre o resultado pois o laplaciano não garante que as bordas tenham largura 1 e isso gera efeitos indesejáveis no resultado final, além de dificultar o uso de operações morfológicas descritas a seguir.\\
+		\subsubsection{Operações morfologicas}
+			Com as bordas da imagem em mãos, processamentos morfologicos são feitos para melhorar o efeito das bordas na imagem final.A operação escolhida aqui é a dilatação, esse processo realça as bordas e tende a juntar regiões, oque  é importante para a eficiência do passo seguinte.\\
+		\subsubsection{Filtrar bordas}
+			Nesta etapa buscamos remover bordas muito pequenas, que geram um efeito muito semelhante ao ruído salt and pepper. Para remover esse "ruído" interpretamos as bordas como regiões conectadas e removemos as que possuirem uma área menor que um limite determinado.  
 \section{Resultados experimentais}
+
 \section{Conclusões}
 
 \begin{thebibliography}{20}
 	\bibitem{CITE-artigobase}
 	Kevin Dade:\\
 	Toonify: Cartoon Photo Effect Application.
-	\bibitem{CITE-filme}
-	Who Framed Roger Rabbit\\
-	https://en.wikipedia.org/wiki/Who\_Framed\_Roger\_Rabbit.
+	\bibitem{CITE-celshading}
+	Cel shading\\
+	https://en.wikipedia.org/wiki/Celshading
+
+
 \end{thebibliography}
 
 \end{document}
