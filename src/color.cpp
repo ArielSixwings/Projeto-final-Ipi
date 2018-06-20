@@ -42,9 +42,9 @@ std::tuple<int, int, int, double, double, int, int> defineConstants(
   int interations = 10 + colourfuness/10;
   int neighboorhood = 9;
   double sigma_color = 685/colourfuness;
-  double sigma_space = 6;
+  double sigma_space = 5;
   int kernel = 7;
-  int color_factor = 10 + colourfuness/10;
+  int color_factor = 10 + colourfuness/5;
   return std::forward_as_tuple(
            to_resize, interations, neighboorhood,
            sigma_color, sigma_space,
@@ -62,13 +62,6 @@ cv::Mat blockColorRegions(const cv::Mat& src) {
   int color_factor;
   std::tie(to_resize, interations, neighboorhood, sigma_color, sigma_space,
            kernel, color_factor) = defineConstants(src);
-  std::cout << "to_resize = " << to_resize << '\n';
-  std::cout << "interations = " << interations << '\n';
-  std::cout << "neighboorhood = " << neighboorhood << '\n';
-  std::cout << "sigma_color = " << sigma_color << '\n';
-  std::cout << "sigma_space = " << sigma_space <<'\n';
-  std::cout << "kernel = " << kernel << '\n';
-  std::cout << "color_factor = " << color_factor << '\n';
   cv::Mat filtered;
   cv::pyrDown(src, filtered, cv::Size(src.cols/2, src.rows/2));
   for (int i = 0; i < interations; ++i) {
@@ -79,12 +72,13 @@ cv::Mat blockColorRegions(const cv::Mat& src) {
   } // for (i)
   cv::pyrUp(filtered, filtered, cv::Size(src.cols, src.rows));
   cv::medianBlur(filtered, filtered, kernel);
+  int bright = (255 - int(255/color_factor) * color_factor);
   for (int r = 0; r < filtered.rows; ++r) {
     for (int c = 0; c < filtered.cols; ++c) {
       auto pixel = filtered.at<cv::Vec3b>(r, c);
-      pixel[0] = int(pixel[0]/color_factor) * color_factor;
-      pixel[1] = int(pixel[1]/color_factor) * color_factor;
-      pixel[2] = int(pixel[2]/color_factor) * color_factor;
+      pixel[0] = int(pixel[0]/color_factor) * color_factor + bright;
+      pixel[1] = int(pixel[1]/color_factor) * color_factor + bright;
+      pixel[2] = int(pixel[2]/color_factor) * color_factor + bright;
       filtered.at<cv::Vec3b>(r, c) = pixel;
     } // for (r)
   }  // for (c)
