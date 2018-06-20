@@ -11,7 +11,7 @@
 # Set Varibles #################################################################
 
 # Directory and name of the executable:
-EXEC = a.out
+EXEC = toonify
 
 #Directory of source code:
 DIR_SOURCE = src
