@@ -29,6 +29,7 @@ cv::Mat toonify(cv::Mat& src) {
   });
 	cv::Mat toon_edges = edges::TakeEdges(src, 55, 5);
 	toon_edges = edges::Dilate(toon_edges);
+	toon_edges = edges::EdgeFilter(toon_edges,12);
 	edges::TakeNegative(toon_edges);
   do_colors.join();
 	cv::Mat img = recombine::Recombine(toon_color, toon_edges, 0.5);
